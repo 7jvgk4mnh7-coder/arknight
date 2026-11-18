@@ -18,6 +18,14 @@
 
 > 剧情文本版权归鹰角网络（Hypergryph）所有，仅供个人查阅，请勿商用或二次分发。
 
+## 下载（不用编译）
+
+- **Windows**：[Releases](https://github.com/7jvgk4mnh7-coder/arknight/releases/latest) 里的 `ArknightsLore-PC-*.zip`，解压后双击 `方舟剧情库.exe`（Win10/11 自带 WebView2）
+- **安卓**：同一个页面里的 `ArknightsLore-*.apk`，允许安装未知来源即可（minSdk 24）
+- **网页版**：下载仓库里的 `dist/release/lore.html`，双击用浏览器打开，离线可用
+
+程序里点「检查更新」会从本仓库拉内容包，不用重装。
+
 ---
 
 ## 作为 DSH 插件
