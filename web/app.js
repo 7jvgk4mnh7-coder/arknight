@@ -281,6 +281,10 @@
       + '</div>'
       + '<div class="scrim" id="scrim"></div>'
       + '<div class="toast" id="toast"></div>'
+      + '<div class="updbar" id="updbar">'
+      + '<div class="updlbl" id="updlbl">正在下载…</div>'
+      + '<div class="updtrack"><div class="updfill" id="updfill"></div></div>'
+      + '</div>'
 
     applyTheme()
     bind()
@@ -320,6 +324,38 @@
     el._t = setTimeout(function () { el.style.display = 'none' }, 毫秒 || 4000)
   }
 
+  // ---- 下载进度条 ----
+  var 进度定时 = null
+
+  function 显示进度(文字) {
+    var bar = $('#updbar')
+    if (!bar) return
+    bar.style.display = 'block'
+    $('#updlbl').textContent = 文字 || '正在下载…'
+    $('#updfill').style.width = '0%'
+    clearTimeout(进度定时)
+  }
+
+  function 设置进度(已收, 总数) {
+    var bar = $('#updbar')
+    if (!bar) return
+    bar.style.display = 'block'
+    var 百分比 = 总数 > 0 ? Math.min(100, Math.round((已收 / 总数) * 100)) : 0
+    $('#updfill').style.width = 百分比 + '%'
+    var 已 = (已收 / 1048576).toFixed(1)
+    var 总 = 总数 > 0 ? (总数 / 1048576).toFixed(1) + ' MB' : '? MB'
+    $('#updlbl').textContent = '正在下载 ' + 已 + ' / ' + 总 + ' · ' + 百分比 + '%'
+  }
+
+  function 结束进度(文字, 毫秒) {
+    var bar = $('#updbar')
+    if (!bar) return
+    if (文字) $('#updlbl').textContent = 文字
+    $('#updfill').style.width = '100%'
+    clearTimeout(进度定时)
+    进度定时 = setTimeout(function () { bar.style.display = 'none' }, 毫秒 || 2500)
+  }
+
   function 更新通道() {
     if (window.arkUpdate) return 'android'
     if (window.chrome && window.chrome.webview) return 'pc'
@@ -331,7 +367,7 @@
     if (!r.newer) { toast('已是最新版本（' + r.current + '）'); return }
     var 大小 = r.size ? '（' + (r.size / 1048576).toFixed(1) + ' MB）' : ''
     if (!window.confirm('发现新版本 ' + r.latest + 大小 + '\n' + (r.notes || '') + '\n\n现在下载并更新？')) return
-    toast('正在下载 ' + r.latest + '…需要一点时间', 120000)
+    显示进度('准备下载 ' + r.latest + '…')
     var ch = 更新通道()
     if (ch === 'android') window.arkUpdate.apply()
     else window.chrome.webview.postMessage(JSON.stringify({ type: 'do-update' }))
@@ -347,9 +383,15 @@
     if (ch === 'android') {
       window.__arkUpdate = {
         result: function (r) { 处理更新结果(r) },
+        progress: function (p) { 设置进度((p && p.received) || 0, (p && p.total) || 0) },
         done: function (r) {
-          if (r && r.ok) toast('已更新到 ' + (r.version || '新版本') + '，正在重新加载…', 8000)
-          else toast('更新失败：' + ((r && r.error) || '未知错误'), 8000)
+          if (r && r.ok) {
+            结束进度('更新完成，正在重新加载…', 4000)
+          } else {
+            结束进度('')
+            $('#updbar').style.display = 'none'
+            toast('更新失败：' + ((r && r.error) || '未知错误'), 8000)
+          }
         },
       }
       try { window.arkUpdate.check() } catch (e) { toast('更新通道不可用') }
@@ -370,9 +412,16 @@
           return
         }
         处理更新结果(r)
+      } else if (r.type === 'update-progress') {
+        设置进度(r.received || 0, r.total || 0)
       } else if (r.type === 'update-done') {
-        if (r.ok) toast('已更新到 ' + (r.version || '新版本') + '，正在重新加载…', 8000)
-        else toast('更新失败：' + (r.error || '未知错误'), 8000)
+        if (r.ok) {
+          结束进度('更新完成，正在重新加载…', 4000)
+        } else {
+          var bar = $('#updbar')
+          if (bar) bar.style.display = 'none'
+          toast('更新失败：' + (r.error || '未知错误'), 8000)
+        }
       }
     })
   }

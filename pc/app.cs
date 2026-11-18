@@ -241,11 +241,33 @@ namespace ArknightsLore
                     string url = "https://raw.githubusercontent.com/" + UpdateCfg.Repo + "/" + UpdateCfg.Branch
                         + "/dist/release/lore.html?t=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-                    byte[] 数据 = await http.GetByteArrayAsync(url);
-                    if (数据.Length < 1024 * 512) throw new InvalidOperationException("下载内容异常（" + 数据.Length + " 字节）");
-
                     string 临时 = Path.Combine(Root, "lore.new.html");
-                    File.WriteAllBytes(临时, 数据);
+                    long 已收 = 0;
+                    long 总数 = 0;
+                    using (HttpResponseMessage resp = await http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        resp.EnsureSuccessStatusCode();
+                        总数 = resp.Content.Headers.ContentLength.HasValue ? resp.Content.Headers.ContentLength.Value : 0;
+                        using (Stream src = await resp.Content.ReadAsStreamAsync())
+                        using (FileStream fs = File.Create(临时))
+                        {
+                            byte[] buf = new byte[81920];
+                            DateTime 上次 = DateTime.UtcNow;
+                            int n;
+                            while ((n = await src.ReadAsync(buf, 0, buf.Length)) > 0)
+                            {
+                                await fs.WriteAsync(buf, 0, n);
+                                已收 += n;
+                                if ((DateTime.UtcNow - 上次).TotalMilliseconds > 180)
+                                {
+                                    上次 = DateTime.UtcNow;
+                                    回复("{\"type\":\"update-progress\",\"received\":" + 已收 + ",\"total\":" + 总数 + "}");
+                                }
+                            }
+                        }
+                    }
+                    if (已收 < 1024 * 512) throw new InvalidOperationException("下载内容异常（" + 已收 + " 字节）");
+                    回复("{\"type\":\"update-progress\",\"received\":" + 已收 + ",\"total\":" + (总数 > 0 ? 总数 : 已收) + "}");
 
                     // 版本号从新页面里取不到，就沿用清单里的；这里用长度做标记，下次启动会重算
                     string 清单 = "";
@@ -261,14 +283,14 @@ namespace ArknightsLore
                     string 正本 = Path.Combine(Root, "lore.html");
                     if (File.Exists(正本)) File.Delete(正本);
                     File.Move(临时, 正本);
-                    File.WriteAllText(Path.Combine(Root, "version.txt"), (清单.Length > 0 ? 清单 : UpdateCfg.Version) + ":" + 数据.Length);
+                    File.WriteAllText(Path.Combine(Root, "version.txt"), (清单.Length > 0 ? 清单 : UpdateCfg.Version) + ":" + 已收);
 
                     foreach (string 旧 in Directory.GetFiles(Root, "lore.new.*"))
                     {
                         try { File.Delete(旧); } catch { }
                     }
 
-                    回复("{\"type\":\"update-done\",\"ok\":true,\"size\":" + 数据.Length + ",\"version\":\"" + 转义(清单) + "\"}");
+                    回复("{\"type\":\"update-done\",\"ok\":true,\"size\":" + 已收 + ",\"version\":\"" + 转义(清单) + "\"}");
                     Navigate();
                 }
             }

@@ -205,16 +205,26 @@ public class MainActivity extends Activity {
                         int code = c.getResponseCode();
                         if (code / 100 != 2) throw new Exception("HTTP " + code);
 
+                        long 总数 = c.getContentLength();
                         File 临时 = new File(getFilesDir(), "lore.new.html");
                         FileOutputStream out = new FileOutputStream(临时);
                         InputStream in = new BufferedInputStream(c.getInputStream());
                         byte[] buf = new byte[65536];
                         int n;
                         long 总 = 0;
-                        while ((n = in.read(buf)) > 0) { out.write(buf, 0, n); 总 += n; }
+                        long 上次 = 0;
+                        while ((n = in.read(buf)) > 0) {
+                            out.write(buf, 0, n);
+                            总 += n;
+                            if (总 - 上次 > 300 * 1024) {
+                                上次 = 总;
+                                回调("window.__arkUpdate && window.__arkUpdate.progress({received:" + 总 + ",total:" + 总数 + "})");
+                            }
+                        }
                         out.close();
                         in.close();
                         c.disconnect();
+                        回调("window.__arkUpdate && window.__arkUpdate.progress({received:" + 总 + ",total:" + (总数 > 0 ? 总数 : 总) + "})");
 
                         if (总 < 512 * 1024) throw new Exception("下载内容异常（" + 总 + " 字节）");
 
