@@ -1,0 +1,20 @@
+# ============================================================================
+# dsh-arknights-lore —— bundle patch（插件自己声明往 profile 里插什么）
+# ============================================================================
+# 装好后 profile 在 dsh.profile.bundles 里列出本包名即生效；不用手改 profile
+# 自己的 cordis.patch.yml。
+#
+# 语料默认读包内 data/lore.json；要换一份（比如自己重新导出、放别处），
+# 在 profile 里覆盖本行的 config：
+#
+#   - id: arknights-lore
+#     config:
+#       corpusFile: 'D:\lore\lore.json'
+#       announce: true          # 是否往系统提示里插一句「有剧情库，先查原文」
+# ============================================================================
+
+- insert:
+    - id: arknights-lore
+      name: dsh-arknights-lore
+      config:
+        announce: true

@@ -1,0 +1,12 @@
+# 构建/产物（都很大，别进版本库）
+data/
+dist/*
+# 但发布物要进库：程序更新就靠 raw.githubusercontent 拉这两个文件
+!dist/release/
+!dist/release/**
+.toolchain/
+.build/
+android/assets/
+android/res/mipmap-*/
+.pcbuild/
+pc/*.exe

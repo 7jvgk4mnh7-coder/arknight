@@ -1,0 +1,64 @@
+{
+  "name": "dsh-arknights-lore",
+  "version": "0.4.0",
+  "description": "方舟剧情库：把本机《明日方舟》全剧情文本变成 DSH 里能搜、能读、能查档案的剧情库 —— 模型有 5 个工具，人有一个侧边栏面板。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "arknights",
+    "明日方舟",
+    "剧情",
+    "lore"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "data",
+    "scripts",
+    "cordis.patch.yml",
+    "locale",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  },
+  "scripts": {
+    "build:corpus": "node scripts/build-corpus.mjs",
+    "build:standalone": "node scripts/build-standalone.mjs",
+    "verify:standalone": "node scripts/verify-standalone.mjs && node scripts/verify-ui.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "try": "node scripts/try-search.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
