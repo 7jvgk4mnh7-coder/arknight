@@ -1,10 +1,10 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "repo": "7jvgk4mnh7-coder/arknight",
   "branch": "main",
-  "notes": "首个公开版本：全文检索、目录、人物档案、世界（国家/地区/组织）、跨剧情时间轴",
+  "notes": "更新链路测试版：内容与 0.4.0 相同，仅用于验证「检查更新」",
   "size": 15953429,
   "sha256": "aabc47c2551bb1cc",
   "file": "lore.html",
-  "builtAt": "2026-11-18T04:18:07.497Z"
+  "builtAt": "2026-11-18T04:26:34.998Z"
 }
