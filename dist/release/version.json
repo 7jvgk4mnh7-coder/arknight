@@ -1,10 +1,5 @@
 {
-  "version": "0.4.2",
-  "repo": "7jvgk4mnh7-coder/arknight",
-  "branch": "main",
-  "notes": "下载进度条：检查更新时显示已下载/总大小和百分比",
-  "size": 15955660,
-  "sha256": "f3b524f649e55676",
-  "file": "lore.html",
-  "builtAt": "2026-11-18T04:35:35.862Z"
+  "version": "0.4.3",
+  "notes": "升级公告：方舟剧情库已升级为《泰拉图书馆》，请找作者拿新版",
+  "file": "lore.html"
 }
