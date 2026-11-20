@@ -1,6 +1,6 @@
 {
-  "version": "1.1.1",
-  "notes": "目录页显示新版本提示；设定集图片分卷下载，更新更快",
+  "version": "1.1.2",
+  "notes": "统一界面版本号显示；目录页新版本提示",
   "file": "app.zip",
   "corpus": "corpus.zip",
   "images": [
